@@ -1,38 +1,80 @@
-.App {
-  text-align: center;
+/* src/App.css */
+:root {
+  --bg-dark: #0f172a;
+  --bg-card: #1e293b;
+  --bg-column: #334155;
+  --accent: #38bdf8;
+  --text-main: #f8fafc;
+  --danger: #ef4444;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+body {
+  margin: 0;
+  background-color: var(--bg-dark);
+  color: var(--text-main);
+  font-family: 'Inter', -apple-system, sans-serif;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
+.app-container {
+  padding: 20px;
   min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
 }
 
-.App-link {
-  color: #61dafb;
+.header {
+  border-bottom: 1px solid var(--bg-column);
+  padding-bottom: 15px;
+  margin-bottom: 20px;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.header h1 {
+  margin: 0;
+  color: var(--accent);
+  letter-spacing: 1px;
+}
+
+.main-grid {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 25px;
+}
+
+.kanban-board {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
+  background: var(--bg-card);
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+}
+
+.column {
+  background: var(--bg-column);
+  padding: 15px;
+  border-radius: 8px;
+  min-height: 500px;
+}
+
+.column h3 {
+  text-align: center;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-bottom: 15px;
+  opacity: 0.8;
+}
+
+.incident-card {
+  background: #475569;
+  padding: 12px;
+  margin-bottom: 10px;
+  border-radius: 6px;
+  border-left: 4px solid var(--accent);
+  cursor: grab;
+  transition: transform 0.1s;
+}
+
+.incident-card:hover {
+  transform: translateY(-2px);
+  background: #4e5d71;
 }
