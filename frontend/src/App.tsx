@@ -4,9 +4,12 @@ import { ChaosMeter } from './components/ChaosMeter';
 import { Log } from './components/Log';
 import { useStore } from './store';
 import { useWebSocket } from './hooks/useWebSocket';
+import { KanbanColumn } from './components/Kanban/KanbanColumn';
 
 function App() {
   useWebSocket('ws://localhost:8080/ws');
+
+  const updateStatus = useStore((state) => state.updateStatus);
   const incidents = useStore((state) => state.incidents);
 
   return (
@@ -20,32 +23,23 @@ function App() {
 
         <main className="main-grid">
           <section className="kanban-board">
-            <div className="column">
-              <h3>Todo</h3>
-              {incidents.filter(i => i.status === 'todo').map(inc => (
-                  <div key={inc.id} className="incident-card">
-                    {inc.title}
-                  </div>
-              ))}
-            </div>
+              <KanbanColumn
+                  status="todo"
+                  incidents={incidents.filter(i => i.status === 'todo')}
+                  onMove={updateStatus}
+              />
 
-            <div className="column">
-              <h3>In Progress</h3>
-              {incidents.filter(i => i.status === 'in_progress').map(inc => (
-                  <div key={inc.id} className="incident-card">
-                    {inc.title}
-                  </div>
-              ))}
-            </div>
+            <KanbanColumn
+                status="in_progress"
+                incidents={incidents.filter(i => i.status === 'in_progress')}
+                onMove={updateStatus}
+            />
 
-            <div className="column">
-              <h3>Resolved</h3>
-              {incidents.filter(i => i.status === 'done').map(inc => (
-                  <div key={inc.id} className="incident-card">
-                    {inc.title}
-                  </div>
-              ))}
-            </div>
+            <KanbanColumn
+                status="done"
+                incidents={incidents.filter(i => i.status === 'done')}
+                onMove={updateStatus}
+            />
           </section>
 
           <aside>
