@@ -10,13 +10,12 @@ interface Incident {
 interface State {
     incidents: Incident[];
     updateStatus: (id: number, newStatus: string) => void;
+    addIncident: (inc: Incident) => void;
+    removeIncident: (id: number) => void;
 }
 
 export const useStore = create<State>((set) => ({
-    incidents: [
-        { id: 1, title: "Crowd crush at Stage A", status: "todo" },
-        { id: 2, title: "Power outage at Bar", status: "in_progress" }
-    ],
+    incidents: [],
 
     updateStatus: (id, newStatus) => set((state) => ({
         // Use .map() to find the ID and change the status, leaving others alone
@@ -24,4 +23,14 @@ export const useStore = create<State>((set) => ({
             inc.id === id ? { ...inc, status: newStatus } : inc
         ),
     })),
+
+    addIncident: (newInc: Incident) => set((state) => ({
+        incidents: state.incidents.find(i => i.id === newInc.id)
+            ? state.incidents
+            : [...state.incidents, newInc]
+    })),
+
+    removeIncident: (id: number) => set((state) => ({
+        incidents: state.incidents.filter(i => i.id !== id)
+    }))
 }));

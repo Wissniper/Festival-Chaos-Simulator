@@ -5,9 +5,10 @@ interface Props {
     status: string;
     incidents: any[];
     onMove: (id: number, newStatus: string) => void;
+    onDelete: (id: number) => void;
 }
 
-export const KanbanColumn = ({ status, incidents, onMove }: Props) => {
+export const KanbanColumn = ({ status, incidents, onMove, onDelete }: Props) => {
     // 2. Define the drop hook
     const [{ isOver }, dropRef] = useDrop(() => ({
         accept: 'INCIDENT',
@@ -26,7 +27,7 @@ export const KanbanColumn = ({ status, incidents, onMove }: Props) => {
         >
             <h3>{status.replace('_', ' ')}</h3>
             {incidents.map(inc => (
-                <IncidentCard key={inc.id} inc={inc} />
+                <IncidentCard key={inc.id} inc={inc} onDelete={onDelete} />
             ))}
         </div>
     );

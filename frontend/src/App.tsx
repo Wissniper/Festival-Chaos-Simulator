@@ -7,9 +7,8 @@ import { useWebSocket } from './hooks/useWebSocket';
 import { KanbanColumn } from './components/Kanban/KanbanColumn';
 
 function App() {
-  useWebSocket('ws://localhost:8080/ws');
+  const { sendUpdate, sendDelete } = useWebSocket('ws://localhost:8080/ws');
 
-  const updateStatus = useStore((state) => state.updateStatus);
   const incidents = useStore((state) => state.incidents);
 
   return (
@@ -26,19 +25,22 @@ function App() {
               <KanbanColumn
                   status="todo"
                   incidents={incidents.filter(i => i.status === 'todo')}
-                  onMove={updateStatus}
+                  onMove={sendUpdate}
+                  onDelete={sendDelete}
               />
 
             <KanbanColumn
                 status="in_progress"
                 incidents={incidents.filter(i => i.status === 'in_progress')}
-                onMove={updateStatus}
+                onMove={sendUpdate}
+                onDelete={sendDelete}
             />
 
             <KanbanColumn
                 status="done"
                 incidents={incidents.filter(i => i.status === 'done')}
-                onMove={updateStatus}
+                onMove={sendUpdate}
+                onDelete={sendDelete}
             />
           </section>
 
