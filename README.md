@@ -1,94 +1,162 @@
-# Festival-Chaos-Simulator
+# Festival Chaos Simulator
 
-**A Go & React Concurrency Showcase**
+A real-time collaborative incident management system built with Go and React. Simulates a festival control room where multiple users can manage incidents across a shared Kanban board with live synchronization via WebSockets.
 
-Build a high-stakes **Festival Chaos Simulator** simulator: a Golang-driven backend that generates "chaos" and a React dashboard where a live "crew" resolves incidents in real-time. This project runs entirely locally to focus on **WebSockets**, **concurrency patterns**, and **complex UI state management**.
+![Go](https://img.shields.io/badge/Go-1.23-00ADD8?logo=go&logoColor=white)
+![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black)
+![TypeScript](https://img.shields.io/badge/TypeScript-4.9-3178C6?logo=typescript&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?logo=docker&logoColor=white)
 
----
+## Features
 
-## 1. Project Concept
+- **Real-time Sync** - All actions (add, update, delete) sync instantly across all connected clients via WebSockets
+- **Collaborative Kanban Board** - Drag-and-drop incidents between Todo, In Progress, and Done columns
+- **Auto-generated Incidents** - Backend continuously generates new incidents to simulate chaos
+- **Multi-device Support** - Works across browsers, tabs, and devices simultaneously
+- **Chaos Meter** - Visual indicator of current incident load
 
-A real-time "Student Kick-Off" control room application. A Golang server continuously generates incidents and tasks, pushing them via WebSockets to a React dashboard. Multiple "crew members" can open the app simultaneously to view, claim, and resolve issues live across all connected browsers.
+## Tech Stack
 
----
+### Backend
+- **Go 1.23** with Gin HTTP framework
+- **Gorilla WebSocket** for real-time communication
+- **Concurrent architecture** with goroutines and channels
+- In-memory state management with mutex protection
 
-## 2. Core Functionality
+### Frontend
+- **React 19** with TypeScript
+- **Zustand** for state management
+- **React DnD** for drag-and-drop functionality
+- Custom WebSocket hook with auto-reconnect
 
-### Live Incident Feed
+## Project Structure
 
-* **Auto-Generation:** Cards appear instantly (e.g., *"Stage 1 – Audio Out"*, *"Food Truck 3 – Power Failure"*).
-* **Metadata:** Every incident tracks priority (Low/Medium/High) and zone (Stage, Bar, Food, Entrance).
+```
+├── backend/
+│   ├── hub/
+│   │   └── hub.go          # WebSocket hub & broadcast logic
+│   ├── models/
+│   │   └── incident.go     # Data structures
+│   ├── generator.go        # Incident auto-generation
+│   ├── handler.go          # WebSocket connection handler
+│   ├── main.go             # Entry point
+│   └── Dockerfile
+├── frontend/
+│   ├── src/
+│   │   ├── components/
+│   │   │   ├── Kanban/
+│   │   │   ├── ChaosMeter.tsx
+│   │   │   ├── IncidentCard.tsx
+│   │   │   └── Log.tsx
+│   │   ├── hooks/
+│   │   │   └── useWebSocket.tsx
+│   │   ├── store/
+│   │   │   └── index.ts
+│   │   └── App.tsx
+│   ├── Dockerfile
+│   └── nginx.conf
+├── .github/workflows/
+│   ├── ci-backend.yml
+│   ├── ci-frontend.yml
+│   ├── cd-backend.yml
+│   └── cd-frontend.yml
+└── docker-compose.yml
+```
 
-### Collaborative Crew Board
+## Quick Start
 
-* **Multi-user Sync:** Everyone sees the same board (To-Do / In Progress / Done).
-* **Live Updates:** Dragging a card in one tab updates the position instantly for all other users.
+### Prerequisites
+- Go 1.21+
+- Node.js 20+
+- Docker & Docker Compose (optional)
 
-### Chaos Metrics & Logs
+### Local Development
 
-* **Chaos Meter:** A visual score that rises when issues pile up and drops as they are resolved.
-* **Event Log:** A real-time stream (e.g., *"19:02: Lighting crash at Stage 2"*, *"19:03: Joris picked up task"*).
+**Backend:**
+```bash
+cd backend
+go mod download
+go run .
+```
+Server runs on `http://localhost:8080`
 
-### Simulation Controls (Admin)
+**Frontend:**
+```bash
+cd frontend
+npm install
+npm start
+```
+App runs on `http://localhost:3000`
 
-* **Frequency Slider:** Adjust the pace from "Quiet Shift" to "Total Chaos."
-* **Wave Injector:** Toggle specific triggers like "Random Crash Waves."
+### Docker
 
----
+```bash
+docker-compose up --build
+```
 
-## 3. Technical Architecture
+- Frontend: `http://localhost:3000`
+- Backend: `http://localhost:8080`
 
-### **Backend (Golang)**
+## API
 
-* **Server:** Gin HTTP framework.
-* **Communication:** Gorilla WebSocket for the `/ws` endpoint.
-* **Concurrency:**
-* **`incidentGenerator` Goroutine:** Periodically pushes random incidents into an internal channel.
-* **The "Hub":** Coordinates all incoming events and broadcasts them to all active clients.
+### WebSocket Endpoint
 
+```
+ws://localhost:8080/ws
+```
 
-* **State:** In-memory maps/slices for Incidents and Clients (no DB required).
+### Message Format
 
-### **Frontend (React)**
-
-* **Connectivity:** Custom `useWebSocket` hook for connection management and auto-reconnect.
-* **State Management:** Zustand or Context API for incidents and the Chaos Score.
-* **UI Components:**
-* `IncidentBoard` (Kanban layout)
-* `LiveFeed` (Scrolling logs)
-* `ChaosMeter` (Visual gauges)
-
-
-
----
-
-## 4. Key Data Structures
-
-### **Go (Backend)**
-
-```go
-type Incident struct {
-    ID        int    `json:"id"`
-    Title     string `json:"title"`
-    Location  string `json:"location"` // e.g., Stage A, Bar, Entrance
-    Severity  string `json:"severity"` // low, medium, high
-    Status    string `json:"status"`   // todo, in_progress, done
-    Assignee  string `json:"assignee"` // Crew member name
+```typescript
+interface Message {
+  action: 'add' | 'update' | 'delete';
+  incident?: Incident;  // For add action
+  id?: number;          // For update/delete actions
+  status?: string;      // For update action
 }
 
-type ServerState struct {
-    Incidents map[int]*Incident
-    Clients   map[*websocket.Conn]bool
-    Mu        sync.Mutex // Essential for thread-safety
+interface Incident {
+  id: number;
+  title: string;
+  status: 'todo' | 'in_progress' | 'done';
 }
 ```
 
----
+## CI/CD
 
-## 5. Primary Screens
+GitHub Actions workflows:
 
-| Screen | Key Features |
-| --- | --- |
-| **Login** | Choose a crew name to identify yourself on the board. |
-| **Main Dashboard** | Kanban board (Left), Chaos Meter (Top), Live Event Log (Right). |
-| **Control Panel** | Admin sliders for "Incident Frequency" and "Start/Pause Simulation." |
+| Workflow | Trigger | Action |
+|----------|---------|--------|
+| `ci-backend.yml` | Push/PR to `backend/**` | Run Go tests & build |
+| `ci-frontend.yml` | Push/PR to `frontend/**` | Run npm tests & build |
+| `cd-backend.yml` | Tag `v*` | Build & push Docker image |
+| `cd-frontend.yml` | Tag `v*` | Build & push Docker image |
+
+Docker images are published to GitHub Container Registry:
+```
+ghcr.io/<username>/festival-chaos-simulator/backend
+ghcr.io/<username>/festival-chaos-simulator/frontend
+```
+
+## Architecture
+
+```
+┌─────────────┐     WebSocket      ┌─────────────┐
+│   Frontend  │◄──────────────────►│   Backend   │
+│   (React)   │                    │    (Go)     │
+└─────────────┘                    └──────┬──────┘
+                                          │
+                                   ┌──────┴──────┐
+                                   │     Hub     │
+                                   │  (Broadcast)│
+                                   └──────┬──────┘
+                                          │
+                              ┌───────────┼───────────┐
+                              ▼           ▼           ▼
+                         Client 1    Client 2    Client N
+```
+
+## License
+
+MIT
